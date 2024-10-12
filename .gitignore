@@ -11,3 +11,5 @@ data/*
 !data/processed/train/.gitkeep
 !data/raw/test/.gitkeep
 !data/raw/train/.gitkeep
+
+*.DS_Store
