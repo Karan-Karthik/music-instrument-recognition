@@ -1,0 +1,10 @@
+# Ignore everything in the data folder
+data/*
+
+# But keep .gitkeep files to ensure empty folders are tracked
+!data/processed/.gitkeep
+!data/processed/test/.gitkeep
+!data/processed/train/.gitkeep
+!data/raw/.gitkeep
+!data/raw/test/.gitkeep
+!data/raw/train/.gitkeep
