@@ -1,10 +1,13 @@
 # Ignore everything in the data folder
 data/*
 
-# But keep .gitkeep files to ensure empty folders are tracked
-!data/processed/.gitkeep
+# But keep the data folder and subdirectories that lead to the data
+!data/
+!data/processed/
+!data/raw/
+
+# Keep the .gitkeep files in the test and train subdirectories
 !data/processed/test/.gitkeep
 !data/processed/train/.gitkeep
-!data/raw/.gitkeep
 !data/raw/test/.gitkeep
 !data/raw/train/.gitkeep
