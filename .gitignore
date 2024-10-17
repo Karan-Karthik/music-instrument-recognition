@@ -3,13 +3,21 @@ data/*
 
 # But keep the data folder and subdirectories that lead to the data
 !data/
-!data/processed/
-!data/raw/
 
 # Keep the .gitkeep files in the test and train subdirectories
-!data/processed/test/.gitkeep
-!data/processed/train/.gitkeep
-!data/raw/test/.gitkeep
-!data/raw/train/.gitkeep
+!data/test/.gitkeep
+!data/train/.gitkeep
+
+# Ignore all large data files in the artifacts directory
+artifacts/*.pkl
+artifacts/*.txt
+
+# Allow specific important files in the artifacts directory
+!artifacts/cnn_instrument_classifier.pth
+
+
+
+
+
 
 *.DS_Store

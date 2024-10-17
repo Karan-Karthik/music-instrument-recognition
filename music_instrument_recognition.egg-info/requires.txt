@@ -1,0 +1,11 @@
+librosa
+numpy
+matplotlib
+seaborn
+scikit-learn
+torch
+torchvision
+torchaudio
+pandas
+ipykernel
+jupyterlab

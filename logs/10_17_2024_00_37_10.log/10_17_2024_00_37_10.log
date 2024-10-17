@@ -1,0 +1,8 @@
+[2024-10-17 00:37:12,195] 55  root- INFO - Entered training data ingestion method
+[2024-10-17 00:37:57,355] 78  root- INFO - Loaded train Data
+[2024-10-17 00:37:57,666] 88  root- INFO - Entered test data ingestion method
+[2024-10-17 00:39:02,244] 138  root- INFO - Test data loaded and saved
+[2024-10-17 00:39:02,564] 117  root- INFO - Loading raw train and test data to data processor
+[2024-10-17 00:39:03,892] 55  root- INFO - Loaded data from artifacts/raw_train_audio_files.pkl
+[2024-10-17 00:39:05,768] 55  root- INFO - Loaded data from artifacts/raw_test_audio_files.pkl
+[2024-10-17 00:39:05,772] 122  root- INFO - Processing training data
