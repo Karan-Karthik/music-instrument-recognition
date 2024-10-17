@@ -1,0 +1,19 @@
+librosa
+numpy
+matplotlib
+seaborn
+scikit-learn
+torch
+torchvision
+torchaudio
+pandas
+scipy
+blas
+lapack
+ipykernel
+jupyterlab
+libsndfile
+dataclasses
+torchsummary
+pickle
+-e .

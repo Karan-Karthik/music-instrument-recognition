@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: music-instrument-recognition
+Version: 0.0.1
+Author: Karan Karthik
+Author-email: karthikkaran5@gmail.com
+Requires-Dist: librosa
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: seaborn
+Requires-Dist: scikit-learn
+Requires-Dist: torch
+Requires-Dist: torchvision
+Requires-Dist: torchaudio
+Requires-Dist: pandas
+Requires-Dist: ipykernel
+Requires-Dist: jupyterlab
