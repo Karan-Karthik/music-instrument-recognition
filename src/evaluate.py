@@ -2,43 +2,36 @@ from logger import logging
 import os
 import pickle
 import numpy as np
+import torch.nn.functional as F
 import torch
-from model import SpectrogramResNet
+from model import CustomCNN, YOLOLikeCNN
 from train import convert_labels_to_indices, create_label_mapping
 from torch.utils.data import TensorDataset, DataLoader
 
+# Check for Metal GPU support
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+
 def load_model(model, model_path= "/Users/karanwork/Documents/Deep learning project/music-instrument-recognition/artifacts/cnn_instrument_classifier.pth"):
     logging.info(f"Loading model from {model_path}")
-    state_dict = torch.load(model_path)
+    state_dict = torch.load(model_path, map_location=device)  # Ensure the model is loaded on the correct device
     model.load_state_dict(state_dict)
+    model.to(device)  # Move model to the correct device
     model.eval()  # Set model to evaluation mode
     logging.info("Model loaded successfully.")
     return model
 
-# Function to pad spectrograms to the target width
-def pad_spectrogram(spectrogram, target_width):
-        current_width = spectrogram.shape[-1]
-        if current_width < target_width:
-            pad_width = target_width - current_width
-            # Padding along the last dimension (width) with a constant value (e.g., -161 for silence)
-            padded_spectrogram = np.pad(spectrogram, ((0, 0), (0, 0), (0, pad_width)), mode='constant', constant_values=-161)
-            return padded_spectrogram
-        return spectrogram 
-
-
-# Function to simplify filenames for better matching
-def simplify_filename(filename):
-    # Lowercase, remove spaces, file extensions, and special characters
-    return os.path.splitext(filename.lower().replace(" ", "").replace("-", "").replace("_", ""))[0]
 
 def load_filename_label_mapping(filepath):
     filename_label_map = {}
     with open(filepath, 'r') as f:
         for line in f:
             if line.startswith("File:"):
+                # Strip 'File: ' from the beginning and ', Text: ' from the middle to get filename and label
                 parts = line.split(", Text: ")
                 filename = parts[0].replace("File: ", "").strip()
                 label = parts[1].strip()
+                
+                # Store the filename and label in the dictionary
                 filename_label_map[filename] = label
     return filename_label_map
 
@@ -52,6 +45,12 @@ def evaluate_model(model, test_loader):
 
     with torch.no_grad():  # Turn off gradients for evaluation
         for inputs, labels in test_loader:
+            # Move inputs and labels to the device (CPU or GPU)
+            inputs, labels = inputs.to(device), labels.to(device)
+
+            # Ensure inputs have 1 channel (grayscale)
+            if inputs.shape[1] != 1:
+                inputs = inputs.unsqueeze(1)  # Add the channel dimension if missing
 
             # Forward pass through the model
             outputs = model(inputs)
@@ -73,14 +72,11 @@ if __name__ == "__main__":
 
     # Load the filename-to-label mapping
     label_mapping_file = '/Users/karanwork/Documents/Deep learning project/music-instrument-recognition/artifacts/raw_test_audio_files.txt'
-    filename_label_map = load_filename_label_mapping(label_mapping_file)
+    simplified_filename_label_map = load_filename_label_mapping(label_mapping_file)
 
     spectrograms = []
     labels = []
     filenames = []
-
-    # Simplify the keys in the label mapping for better matching
-    simplified_filename_label_map = {simplify_filename(k): v for k, v in filename_label_map.items()}
     spectrogram_info = []
     
 
@@ -90,12 +86,9 @@ if __name__ == "__main__":
         filenames.append(filename)
         spectrograms.append(spectrogram)
 
-        # Simplify the filename for better matching
-        simplified_filename = simplify_filename(filename)
-
         # Get the corresponding label from the filename-to-label mapping
-        if simplified_filename in simplified_filename_label_map:
-            label = simplified_filename_label_map[simplified_filename]
+        if filename in simplified_filename_label_map:
+            label = simplified_filename_label_map[filename]
             labels.append(label)
 
             # Store the spectrogram, filename, and label (tag) together
@@ -105,7 +98,7 @@ if __name__ == "__main__":
                 'label': label
             })
         else:
-            raise ValueError(f"Filename {filename} (simplified as {simplified_filename}) not found in label mapping.")
+            raise ValueError(f"Filename {filename} (simplified as {filename}) not found in label mapping.")
 
 
     # Extract spectrograms and labels from spectrogram_info
@@ -115,26 +108,40 @@ if __name__ == "__main__":
     label_maps = create_label_mapping(labels)
 
     # Convert the list of labels (tags) to indices if needed
-    # Assuming you have already mapped your labels to indices (label_indices)
     label_indices = convert_labels_to_indices(labels, label_maps)  # Convert labels (tags) to indices
     
-
     # Target width based on the maximum size used during training
-    target_width = 1723
-    # Apply padding to all spectrograms that are smaller than the target width
-    padded_spectrograms = [pad_spectrogram(spectrogram, target_width) for spectrogram in spectrograms]
+    target_width = 259
 
-    spectrograms_k = np.array(padded_spectrograms)
-    spectrograms = torch.tensor(spectrograms_k, dtype=torch.float32)
-    labels = torch.tensor(np.array(label_indices), dtype=torch.long)
+    # Assuming spectrograms is a list of numpy arrays (1, 130, variable_width)
+    # First, convert all spectrograms to a PyTorch tensor and interpolate them to the target width
+    padded_spectrograms = []
+    for spectrogram in spectrograms:
+        #print(f"Original shape: {spectrogram.shape}")
+        
+        # Convert numpy array to tensor and add channel dimension to make it 4D (N, C, H, W)
+        spectrogram_tensor = torch.tensor(spectrogram, dtype=torch.float32).unsqueeze(0)  # Assuming it’s already 3D, we add one more dimension for the batch
+        
+        # Interpolate to resize the width to the target width (259), keeping height fixed at 130
+        resized_spectrogram = F.interpolate(spectrogram_tensor, size=(130, target_width), mode='bilinear', align_corners=False)
+        
+        # Append the resized spectrogram to the list (removing the batch dimension if needed)
+        padded_spectrograms.append(resized_spectrogram.squeeze(0))
+        #print(f"Resized shape: {resized_spectrogram.shape}")
 
-    # Create DataLoader for test data
-    test_dataset = TensorDataset(spectrograms, labels)
+    # Concatenate and move the tensor to the correct device
+    spectrograms_tensor = torch.cat(padded_spectrograms, dim=0).to(device)
+
+    labels = torch.tensor(np.array(label_indices), dtype=torch.long).to(device)
+
+
+    # Create DataLoader for test data using spectrograms_tensor
+    test_dataset = TensorDataset(spectrograms_tensor.squeeze(1), labels)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
     # Load the trained model
     num_classes = len(label_maps)
-    model = SpectrogramResNet(num_classes=num_classes)
+    model = YOLOLikeCNN(num_classes=num_classes)
     model = load_model(model, '/Users/karanwork/Documents/Deep learning project/music-instrument-recognition/artifacts/cnn_instrument_classifier.pth')
 
     # Evaluate the model

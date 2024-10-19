@@ -121,7 +121,7 @@ class DataIngestion:
                             audio_files.append({
                                 'spectrogram': spectrogram_db,
                                 'filename': file,
-                                'instrument_tag': text  # Save the instrument tag from .txt file
+
                             })
                         else:
                             logging.warning(f"Text file not found for {file}")

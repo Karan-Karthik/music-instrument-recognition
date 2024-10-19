@@ -17,6 +17,7 @@ save to pickle file
 then start model trainer
 """
 
+
 @dataclass
 class DataTransformationConfig:
     processed_train_path: str = os.path.join('artifacts', 'processed_train_audio_files.pkl')

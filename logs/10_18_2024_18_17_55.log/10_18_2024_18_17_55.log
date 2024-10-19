@@ -1,0 +1,2 @@
+[2024-10-18 18:32:32,528] 26  root- INFO - Saving model to /Users/karanwork/Documents/Deep learning project/music-instrument-recognition/artifacts/cnn_instrument_classifier.pth
+[2024-10-18 18:32:33,283] 28  root- INFO - Model saved successfully.
