@@ -1,0 +1,14 @@
+[2024-11-04 02:19:54,359] 61  root- INFO - Entered training data ingestion method
+[2024-11-04 02:20:28,193] 84  root- INFO - Loaded train Data
+[2024-11-04 02:20:28,413] 93  root- INFO - Entered test data ingestion method
+[2024-11-04 02:26:34,479] 218  root- INFO - Test data loaded and saved
+[2024-11-04 02:26:37,440] 202  root- INFO - Loading raw train and test data to data processor
+[2024-11-04 02:26:38,693] 117  root- INFO - Loaded data from artifacts/raw_train_audio_files.pkl
+[2024-11-04 02:26:48,995] 117  root- INFO - Loaded data from artifacts/raw_test_audio_files.pkl
+[2024-11-04 02:26:48,999] 207  root- INFO - Processing training data
+[2024-11-04 02:29:04,501] 210  root- INFO - Processing testing data
+[2024-11-04 02:29:54,811] 215  root- INFO - Saving processed train data
+[2024-11-04 02:30:27,534] 193  root- INFO - Processed data saved to artifacts/processed_train_audio_files.pkl
+[2024-11-04 02:30:27,540] 220  root- INFO - Saving processed test data
+[2024-11-04 02:31:32,193] 193  root- INFO - Processed data saved to artifacts/processed_test_audio_files.pkl
+[2024-11-04 02:31:32,194] 222  root- INFO - Data transformation completed.

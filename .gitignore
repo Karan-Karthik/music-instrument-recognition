@@ -11,12 +11,9 @@ data/*
 # Ignore all large data files in the artifacts directory
 artifacts/*.pkl
 artifacts/*.txt
-
-# Allow specific important files in the artifacts directory
-!artifacts/cnn_instrument_classifier.pth
+artifacts/*.pth
 
 
 __pycache__/
-
 
 *.DS_Storeartifacts/cnn_instrument_classifier.pth

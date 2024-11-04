@@ -1,2 +1,0 @@
-[2024-10-17 03:49:08,529] 11  root- INFO - Loading model from /Users/karanwork/Documents/Deep learning project/music-instrument-recognition/artifacts/cnn_instrument_classifier.pth
-[2024-10-17 03:49:08,584] 15  root- INFO - Model loaded successfully.

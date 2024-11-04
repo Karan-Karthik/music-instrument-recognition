@@ -5,9 +5,15 @@ import pickle
 from dataclasses import dataclass
 from logger import logging
 from data_processor import DataTransformation
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
 #from exceptions.DataException import k
+# Function to add a small amount of noise
+def add_noise(data, noise_level=0.001):
+    noise = noise_level * np.random.normal(size=data.shape)
+    return data + noise
+
 
 @dataclass
 class DataIngestionConfig:
@@ -51,7 +57,7 @@ class DataIngestion:
 
 
     def load_instruments_train_data(self):
-        train_dir = '/Users/karanwork/Documents/Deep learning project/music-instrument-recognition/data/train'
+        train_dir = 'data/train'
         logging.info('Entered training data ingestion method')
 
         if not os.path.exists(train_dir):
@@ -83,7 +89,7 @@ class DataIngestion:
         Load all instrument test data by splitting audio files into 0.2-second chunks if they are longer than 0.2 seconds,
         then save the spectrograms, MFCC, and RMSE features, and associated metadata.
         """
-        test_dir = '/Users/karanwork/Documents/Deep learning project/music-instrument-recognition/data/test'
+        test_dir = 'data/test'
         logging.info('Entered test data ingestion method')
 
         if not os.path.exists(test_dir):
@@ -91,7 +97,7 @@ class DataIngestion:
 
         audio_files = []
         text_data = []
-        chunk_duration = 2.99  # duration of each chunk in seconds
+        chunk_duration = 3  # duration of each chunk in seconds
 
         # Loop through each Part (e.g., Part1, Part2, Part3)
         for part_folder in os.listdir(test_dir):
@@ -131,31 +137,59 @@ class DataIngestion:
                                 spectrogram = librosa.feature.melspectrogram(y=audio_chunk, sr=sample_rate, n_mels=130)
                                 spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
                                 
+                                # Normalize spectrogram_db
+                                spectrogram_db_normalized = spectrogram_db / np.max(np.abs(spectrogram_db))
+                                spectrogram_db = add_noise(spectrogram_db_normalized)
+                                
+                                
                                 # Compute MFCC and RMSE for the chunk
                                 # MFCC: Coefficients that represent the short-term power spectrum of an audio signal on a non-linear Mel scale of frequency
                                 # RMSE: energy or loudness of an audio signal in each frame or segment
                                 mfcc = librosa.feature.mfcc(y=audio_chunk, sr=sample_rate, n_mfcc=130)
+
+                                # Normalize MFCC
+                                scaler = StandardScaler()
+                                mfcc_normalized = scaler.fit_transform(mfcc.T).T
+                                mfcc = add_noise(mfcc_normalized)
+                                
+
                                 rmse = librosa.feature.rms(y=audio_chunk)
+                                # Normalize RMSE
+                                rmse_normalized = (rmse - np.mean(rmse)) / np.std(rmse)
+                                rmse = add_noise(rmse_normalized)
 
                                 # Compute spectral centroid
                                 # Indicates the center of mass of the spectrum, often associated with the "brightness" of a sound
                                 spectral_centroid = librosa.feature.spectral_centroid(y=audio_chunk, sr=sample_rate)
+                                # Normalize spectral centroid
+                                spectral_centroid = add_noise(spectral_centroid)
 
                                 # Compute spectral bandwidth
                                 # Measures the range of frequencies in a sound, helpful in distinguishing instruments with broader vs. narrower frequency ranges
                                 spectral_bandwidth = librosa.feature.spectral_bandwidth(y=audio_chunk, sr=sample_rate)
+                                # Normalize spectral bandwidth
+                                spectral_bandwidth = add_noise(spectral_bandwidth)
+
 
                                 # Compute spectral contrast
                                 # Captures the difference in amplitude between peaks and valleys in the spectrum, useful for identifying texture differences
                                 spectral_contrast = librosa.feature.spectral_contrast(S=spectrogram, sr=sample_rate)
+                                # Normalize spectral contrast
+                                scaler = MinMaxScaler()
+                                spectral_contrast_normalized = scaler.fit_transform(spectral_contrast)
+                                spectral_contrast = add_noise(spectral_contrast_normalized)
 
                                 # Compute spectral rolloff (e.g., rolloff at 85% of energy)
                                 # The frequency below which a certain percentage (e.g., 85%) of the spectral energy is contained, differentiating high-pitched vs. low-pitched sounds
                                 spectral_rolloff = librosa.feature.spectral_rolloff(y=audio_chunk, sr=sample_rate, roll_percent=0.8)
+                                spectral_rolloff = add_noise(spectral_rolloff)
 
                                 # Compute zero-crossing rate (ZCR)
                                 # Counts the number of times the signal crosses zero amplitude, often higher for percussive sounds
                                 zcr = librosa.feature.zero_crossing_rate(y=audio_chunk)
+                                # Normalize ZCR
+                                zcr_normalized = (zcr - np.min(zcr)) / (np.max(zcr) - np.min(zcr))
+                                zcr = add_noise(zcr_normalized)
 
                                 # Add chunk data to the audio_files list
                                 audio_files.append({
@@ -187,15 +221,11 @@ class DataIngestion:
 if __name__== '__main__':
     # Create an object of DataIngestion class
     data_ingestion = DataIngestion()
-    print("data_ingestion started")
     # Load and save the training audio files
     data_ingestion.load_instruments_train_data()
-    print("loaded train data")
     # Load and save the test audio files and their corresponding text files
     data_ingestion.load_instruments_test_data()
-    print("loaded test data")
     # Create an object of DataTransformation class
     data_transformation = DataTransformation()
     # Perform transformation, generate spectrograms, and save to pickle
     data_transformation.transforms()
-    print("data transformed")

@@ -3,6 +3,7 @@ import numpy as np
 import librosa
 import pickle
 import torch
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from torchvision import transforms
 from logger import logging
 from dataclasses import dataclass
@@ -18,10 +19,17 @@ Run other transforms on it
 save to pickle file
 then start model trainer
 """
+
 def normalize(tensor):
-    mean = 0.5
-    std = 0.5
-    return (tensor - mean) / std
+    mean = tensor.mean()
+    std = tensor.std()
+    return (tensor - mean) / (std + 1e-6)  # Adding a small value to avoid division by zero
+
+# Function to add a small amount of noise
+def add_noise(data, noise_level=0.001):
+    noise = noise_level * np.random.normal(size=data.shape)
+    return data + noise
+
 
 @dataclass
 class DataTransformationConfig:
@@ -39,18 +47,48 @@ class DataTransformation:
             transforms.Normalize(mean=[0.5], std=[0.5])  # Normalizes the spectrogram
         ])
 
+
     def convert_to_spectrogram(self, audio_data_tuple):
 
         audio, sample_rate, instrument_tag = audio_data_tuple
 
         spectrogram = librosa.feature.melspectrogram(y=audio, sr=sample_rate, n_mels=130)
         spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
+        # Normalize spectrogram_db
+        spectrogram_db_normalized = spectrogram_db / np.max(np.abs(spectrogram_db))
+        spectrogram_db = add_noise(spectrogram_db_normalized)
+                                
+
         mfcc = librosa.feature.mfcc(y = audio, sr= sample_rate, n_mfcc=130)
+        # Normalize MFCC
+        scaler = StandardScaler()
+        mfcc_normalized = scaler.fit_transform(mfcc.T).T
+        mfcc = add_noise(mfcc_normalized)
+
         rmse = librosa.feature.rms(y=audio)
+        # Normalize RMSE
+        rmse_normalized = (rmse - np.mean(rmse)) / np.std(rmse)
+        rmse = add_noise(rmse_normalized)
+
         spectral_centroid = librosa.feature.spectral_centroid(y= audio, sr=sample_rate)
+        spectral_centroid = add_noise(spectral_centroid)
+
         spectral_bandwidth = librosa.feature.spectral_bandwidth(y = audio, sr= sample_rate)
+        spectral_bandwidth = add_noise(spectral_bandwidth)
+
+        spectral_contrast = librosa.feature.spectral_contrast(S=spectrogram, sr=sample_rate)
+        # Normalize spectral contrast
+        scaler = MinMaxScaler()
+        spectral_contrast_normalized = scaler.fit_transform(spectral_contrast)
+        spectral_contrast = add_noise(spectral_contrast_normalized)
+
         spectral_rolloff = librosa.feature.spectral_rolloff(y = audio, sr = sample_rate, roll_percent=0.8)
+        spectral_rolloff = add_noise(spectral_rolloff)
+
         zcr = librosa.feature.zero_crossing_rate(y=audio)
+        # Normalize ZCR
+        zcr_normalized = (zcr - np.min(zcr)) / (np.max(zcr) - np.min(zcr))
+        zcr = add_noise(zcr_normalized)
 
         
         return {
@@ -59,12 +97,12 @@ class DataTransformation:
             'rmse':rmse,
             'spectral_centroid': spectral_centroid,
             'spectral_bandwidth': spectral_bandwidth,
+            'spectral_contrast': spectral_contrast,
             'spectral_rolloff': spectral_rolloff,
             'zcr': zcr,
             'instrument_tag': instrument_tag
         }
     
-
 
     def load_pickle_file(self, filepath):
         """
@@ -80,35 +118,27 @@ class DataTransformation:
         return data
 
 
-
     def preprocess_training_spectrograms(self, audio_data):
         preprocessed_data = []
         
         # Define the target size for padding
         target_rows = 130  # Adjust this based on your requirements
 
-        # Function to pad each tensor
-        def pad_tensor(tensor, target_rows):
-            current_rows = tensor.shape[0]
-            if current_rows < target_rows:
-                # Pad with zeros if shorter
-                padding = torch.zeros((target_rows - current_rows, tensor.shape[1]), device=device)  # Zero padding on the specified device
-                return torch.cat((tensor, padding), dim=0)  # Concatenate along the first dimension
-            else:
-                return tensor[:target_rows, :]  # Truncate if longer
 
         for audio_data_tuple in audio_data:
-            spectrogram_dict = self.convert_to_spectrogram(audio_data_tuple)
 
+            spectrogram_dict = self.convert_to_spectrogram(audio_data_tuple)
             # Normalize and pad tensors
             # Pad each tensor to the target size
-            spectrogram_tensor = pad_tensor(normalize(torch.tensor(spectrogram_dict['spectrogram'], dtype=torch.float32, device= device)), target_rows)
-            mfcc_tensor = pad_tensor(normalize(torch.tensor(spectrogram_dict['mfcc'], dtype=torch.float32, device= device)), target_rows)
-            rmse_tensor = pad_tensor(normalize(torch.tensor(spectrogram_dict['rmse'], dtype=torch.float32, device= device)), target_rows)
-            spectral_centroid_tensor = pad_tensor(normalize(torch.tensor(spectrogram_dict['spectral_centroid'], dtype=torch.float32, device= device)), target_rows)
-            spectral_bandwidth_tensor = pad_tensor(normalize(torch.tensor(spectrogram_dict['spectral_bandwidth'], dtype=torch.float32, device= device)), target_rows)
-            spectral_rolloff_tensor = pad_tensor(normalize(torch.tensor(spectrogram_dict['spectral_rolloff'], dtype=torch.float32, device= device)), target_rows)
-            zcr_tensor = pad_tensor(normalize(torch.tensor(spectrogram_dict['zcr'], dtype=torch.float32, device= device)), target_rows)
+            spectrogram_tensor = spectrogram_dict['spectrogram']
+            mfcc_tensor = spectrogram_dict['mfcc']
+            rmse_tensor = spectrogram_dict['rmse']
+            spectral_centroid_tensor = spectrogram_dict['spectral_centroid']
+            spectral_bandwidth_tensor = spectrogram_dict['spectral_bandwidth']
+            spectral_contrast_tensor = spectrogram_dict['spectral_contrast']
+            spectral_rolloff_tensor = spectrogram_dict['spectral_rolloff']
+            zcr_tensor = spectrogram_dict['zcr']
+
 
             preprocessed_data.append({
                 'spectrogram': spectrogram_tensor,
@@ -116,6 +146,7 @@ class DataTransformation:
                 'rmse': rmse_tensor,
                 'spectral_centroid': spectral_centroid_tensor,
                 'spectral_bandwidth': spectral_bandwidth_tensor,
+                'spectral_contrast': spectral_contrast_tensor,
                 'spectral_rolloff': spectral_rolloff_tensor,
                 'zcr': zcr_tensor,
                 'instrument_tag': spectrogram_dict['instrument_tag']  # Save instrument tag
@@ -129,13 +160,14 @@ class DataTransformation:
 
         for audio_data_tuple in audio_data:
             
-            spectrogram_tensor = normalize(torch.tensor(audio_data_tuple['spectrogram'], dtype=torch.float32))
-            mfcc_tensor = normalize(torch.tensor(audio_data_tuple['mfcc'], dtype=torch.float32))
-            rmse_tensor = normalize(torch.tensor(audio_data_tuple['rmse'], dtype=torch.float32))
-            spectral_centroid_tensor = normalize(torch.tensor(audio_data_tuple['spectral_centroid'], dtype=torch.float32))
-            spectral_bandwidth_tensor = normalize(torch.tensor(audio_data_tuple['spectral_bandwidth'], dtype=torch.float32))
-            spectral_rolloff_tensor = normalize(torch.tensor(audio_data_tuple['spectral_rolloff'], dtype=torch.float32))
-            zcr_tensor = normalize(torch.tensor(audio_data_tuple['zcr'], dtype=torch.float32))
+            spectrogram_tensor = normalize(torch.tensor(np.array(audio_data_tuple['spectrogram']), dtype=torch.float32))
+            mfcc_tensor = normalize(torch.tensor(np.array(audio_data_tuple['mfcc']), dtype=torch.float32))
+            rmse_tensor = normalize(torch.tensor(np.array(audio_data_tuple['rmse']), dtype=torch.float32))
+            spectral_centroid_tensor = normalize(torch.tensor(np.array(audio_data_tuple['spectral_centroid']), dtype=torch.float32))
+            spectral_bandwidth_tensor = normalize(torch.tensor(np.array(audio_data_tuple['spectral_bandwidth']), dtype=torch.float32))
+            spectral_contrast_tensor = normalize(torch.tensor(np.array(audio_data_tuple['spectral_contrast']), dtype=torch.float32))
+            spectral_rolloff_tensor = normalize(torch.tensor(np.array(audio_data_tuple['spectral_rolloff']), dtype=torch.float32))
+            zcr_tensor = normalize(torch.tensor(np.array(audio_data_tuple['zcr']), dtype=torch.float32))
 
             preprocessed_data.append({
                 'spectrogram': spectrogram_tensor,
@@ -143,6 +175,7 @@ class DataTransformation:
                 'rmse': rmse_tensor,
                 'spectral_centroid': spectral_centroid_tensor,
                 'spectral_bandwidth': spectral_bandwidth_tensor,
+                'spectral_contrast': spectral_contrast_tensor,
                 'spectral_rolloff': spectral_rolloff_tensor,
                 'zcr': zcr_tensor,
                 'filename': audio_data_tuple['filename']
@@ -175,10 +208,13 @@ class DataTransformation:
 
         logging.info("Processing testing data")
         processed_test_data = self.preprocess_test_spectrograms(raw_test_data)
+
         
         # Step 3: Save the processed data to pickle files
         logging.info("Saving processed train data")
-        self.save_preprocessed_data(processed_train_data, self.data_transform_config.processed_train_path)
+        #self.save_preprocessed_data(processed_train_data, self.data_transform_config.processed_train_path)
+
+        self.save_preprocessed_data(processed_train_data, 'artifacts/processed_train_audio_files.pkl')
 
         logging.info("Saving processed test data")
         self.save_preprocessed_data(processed_test_data, self.data_transform_config.processed_test_path)
