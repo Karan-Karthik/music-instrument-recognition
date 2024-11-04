@@ -9,8 +9,7 @@ from torch.utils.data import DataLoader, TensorDataset, random_split
 
 
 # Check for Metal GPU support
-# device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-device = torch.device("mps")
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 
 def create_label_mapping(labels):

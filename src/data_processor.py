@@ -20,6 +20,7 @@ save to pickle file
 then start model trainer
 """
 
+
 def normalize(tensor):
     mean = tensor.mean()
     std = tensor.std()

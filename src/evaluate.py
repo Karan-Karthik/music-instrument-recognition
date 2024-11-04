@@ -9,8 +9,8 @@ from torch.utils.data import TensorDataset, DataLoader
 
 
 # Check for Metal GPU support
-#device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-device = torch.device('cpu')
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+
 
 def load_model(model, model_path= "artifacts/cnn_instrument_classifier.pth"):
     logging.info(f"Loading model from {model_path}")
