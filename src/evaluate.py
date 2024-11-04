@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 import torch.nn.functional as F
 import torch
-from model import CustomResNet18
+from model import CustomCNNLSTM
 from train import convert_labels_to_indices, create_label_mapping
 from torch.utils.data import TensorDataset, DataLoader
 
@@ -62,7 +62,6 @@ def evaluate_model(model, test_loader):
 
     accuracy = correct / total
     return accuracy
-
 
 
 def pad_tensor(tensor, target_depth):
@@ -157,11 +156,11 @@ if __name__ == "__main__":
 
     # Create DataLoader for test data using spectrograms_tensor
     test_dataset = TensorDataset(input_tensor,labels)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
 
     # Load the trained model
     num_classes = len(label_maps)
-    model = CustomResNet18(num_classes=num_classes)
+    model = CustomCNNLSTM(num_classes=num_classes)
     model = load_model(model, 'artifacts/cnn_instrument_classifier.pth')
 
     # Evaluate the model

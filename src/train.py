@@ -1,7 +1,7 @@
 import pickle
 import torch
 import numpy as np
-from model import MultiInputCNN, CustomResNet18
+from model import CustomCNNLSTM
 from logger import logging
 import torch.nn as nn
 import torch.optim as optim
@@ -174,10 +174,10 @@ if __name__ == "__main__":
 
     # Model, criterion, optimizer
     num_classes = len(create_label_mapping(labels))
-    model = CustomResNet18(num_classes=num_classes).to(device)
+    model = CustomCNNLSTM(num_classes=num_classes).to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=1e-5)
 
     # Train the model
-    train_validate_model(model, train_loader, val_loader, criterion, optimizer, num_epochs=15)
+    train_validate_model(model, train_loader, val_loader, criterion, optimizer, num_epochs=25)
