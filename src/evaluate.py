@@ -1,5 +1,4 @@
 from logger import logging
-import os
 import pickle
 import numpy as np
 import torch.nn.functional as F
@@ -7,6 +6,7 @@ import torch
 from model import CustomResNet18
 from train import convert_labels_to_indices, create_label_mapping
 from torch.utils.data import TensorDataset, DataLoader
+
 
 # Check for Metal GPU support
 #device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")

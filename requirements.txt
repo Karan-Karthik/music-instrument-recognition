@@ -17,4 +17,5 @@ libsndfile
 dataclasses
 torchsummary
 pickle
+subprocess
 -e .
