@@ -1,17 +1,6 @@
-# Ignore everything in the data folder
-data/*
-
-# But keep the data folder and subdirectories that lead to the data
-!data/
-
-# Keep the .gitkeep files in the test and train subdirectories
-
-
-# Ignore all large data files in the artifacts directory
 artifacts/*.pkl
-
-
 music_instrument_recognition.egg-info
-
 __pycache__/
+logs
+build
 
