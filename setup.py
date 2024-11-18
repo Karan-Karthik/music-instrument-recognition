@@ -19,7 +19,7 @@ def get_requirements(file_path: str) -> List[str]:
 
 setup(
     name="music-instrument-recognition",
-    version="0.0.1",
+    version="1.0.0",
     author="Karan Karthik",
     author_email="karthikkaran5@gmail.com",
     packages=find_packages(),

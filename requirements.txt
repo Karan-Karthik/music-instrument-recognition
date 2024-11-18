@@ -1,21 +1,7 @@
 librosa
-numpy
-matplotlib
-seaborn
-scikit-learn
 torch
 torchvision
-torchaudio
-pandas
-scipy
-blas
-lapack
-sklearn.preprocessing
-ipykernel
-jupyterlab
-libsndfile
-dataclasses
-torchsummary
-pickle
-subprocess
+logger
+numpy
+scikit-learn
 -e .

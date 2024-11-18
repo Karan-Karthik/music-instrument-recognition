@@ -5,15 +5,13 @@ data/*
 !data/
 
 # Keep the .gitkeep files in the test and train subdirectories
-!data/test/.gitkeep
-!data/train/.gitkeep
+
 
 # Ignore all large data files in the artifacts directory
 artifacts/*.pkl
-artifacts/*.txt
-artifacts/*.pth
 
+
+music_instrument_recognition.egg-info
 
 __pycache__/
 
-*.DS_Storeartifacts/cnn_instrument_classifier.pth

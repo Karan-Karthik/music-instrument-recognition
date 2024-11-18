@@ -1,0 +1,7 @@
+[2024-11-18 01:46:19,005] 42  root- INFO - Entered training data ingestion method
+[2024-11-18 01:46:20,266] 66  root- INFO - Loaded train data without segmentation
+[2024-11-18 01:46:20,273] 86  root- INFO - Loading raw data to data processor
+[2024-11-18 01:46:20,290] 71  root- INFO - Loaded data from artifacts/raw_train_audio_files.pkl
+[2024-11-18 01:46:20,290] 89  root- INFO - Processing training data
+[2024-11-18 01:46:23,651] 81  root- INFO - Processed data saved to artifacts/processed_train_audio_files.pkl
+[2024-11-18 01:46:23,652] 96  root- INFO - Processed train data saved successfully
