@@ -2,7 +2,7 @@
 
 This project aims to classify instruments played in a given audio input using Support Vector Machines (SVM) with the Radial Basis Function (RBF) kernel. The feature extraction process involves using Mel Frequency Cepstral Coefficients (MFCCs) to represent audio data as input features for training and classification.
 
-The model achieved high classification performance, demonstrating its effectiveness in instrument recognition tasks. Specifically, it achieved an accuracy of 98.33% on the test data.
+The model achieved high classification performance, demonstrating its effectiveness in instrument recognition tasks. Specifically, it achieved an accuracy of 99.17% on the test data.
 
 ## MFCC Extraction
 
@@ -25,23 +25,25 @@ The model achieved high classification performance, demonstrating its effectiven
 
 ### Key Metrics:
 
-- **Accuracy**: 98.33%
-- **Precision**: 98.49%
-- **Recall**: 98.33%
-- **F1-Score**: 98.35%
+- **Accuracy**: 99.1667%
+- **Precision**: 99.2222%
+- **Recall**: 99.1667%
+- **F1-Score**: 99.1698%
 
 ### Detailed Classification Report:
 
 | Class     | Precision | Recall | F1-Score | Support |
 |-----------|-----------|--------|----------|---------|
 | Cello     | 1.00      | 1.00   | 1.00     | 27      |
-| Flute     | 1.00      | 1.00   | 1.00     | 14      |
+| Flute     | 1.00      | 1.00   | 1.00     | 19      |
 | Oboe      | 1.00      | 1.00   | 1.00     | 20      |
-| Saxophone | 0.90      | 1.00   | 0.95     | 19      |
-| Trumpet   | 1.00      | 0.95   | 0.97     | 19      |
-| Viola     | 1.00      | 0.95   | 0.98     | 21      |
-| **Overall Accuracy** |       |        | **0.98** | 120     |
+| Saxophone | 1.00      | 0.95   | 0.97     | 19      |
+| Trumpet   | 1.00      | 1.00   | 1.00     | 21      |
+| Viola     | 0.93      | 1.00   | 0.97     | 14      |
+| **Overall Accuracy** |       |        | **0.99** | 120     |
 
-![SVM with RBF kernel](images/classification.png)
+
+
+![SVM with RBF kernel](images/classification_report_heatmap.png)
 
 This report demonstrates the high performance of the model on the validation set. High accuracy, precision, and recall across different instrument classes reflect the effectiveness of the feature extraction and the SVM classifier.
