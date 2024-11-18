@@ -43,6 +43,7 @@ The model achieved high classification performance, demonstrating its effectiven
 | **Overall Accuracy** |       |        | **0.99** | 120     |
 
 
+Below is a heatmap illustrating the classification performance, where a value of 1 indicates 100% accuracy.
 
 ![SVM with RBF kernel](images/classification_report_heatmap.png)
 
