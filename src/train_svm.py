@@ -36,6 +36,7 @@ X_train, X_val, y_train, y_val = train_test_split(features, labels, test_size=0.
 
 # Train the model
 svm_model = SVC(kernel='rbf', C=15, gamma='scale', class_weight='balanced')
+
 svm_model.fit(X_train, y_train)
 
 # Predict on the validation set
