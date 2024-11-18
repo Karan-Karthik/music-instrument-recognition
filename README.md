@@ -17,7 +17,7 @@ The model achieved high classification performance, demonstrating its effectiven
 
 ![SVM Visualization](images/support-vector-machine-svm.jpg.webp)
 
-![SVM with RBF kernel](images/fig2.png)
+![SVM with RBF kernel](images/rbf_kernel.png)
 
 
 
@@ -42,6 +42,6 @@ The model achieved high classification performance, demonstrating its effectiven
 | Viola     | 1.00      | 0.95   | 0.98     | 21      |
 | **Overall Accuracy** |       |        | **0.98** | 120     |
 
-![SVM with RBF kernel](images/Figure_1.png)
+![SVM with RBF kernel](images/classification.png)
 
 This report demonstrates the high performance of the model on the validation set. High accuracy, precision, and recall across different instrument classes reflect the effectiveness of the feature extraction and the SVM classifier.
