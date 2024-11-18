@@ -1,6 +1,0 @@
-artifacts/*.pkl
-music_instrument_recognition.egg-info
-__pycache__/
-logs
-build
-
