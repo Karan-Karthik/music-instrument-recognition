@@ -38,7 +38,7 @@ class DataIngestion:
 
 
     def load_instruments_train_data(self):
-        train_dir = '/Users/karanwork/Documents/Deep learning project/music-instrument-recognition/data/london_phill_dataset_multi'
+        train_dir = 'data/london_phill_dataset_multi'
         logging.info('Entered training data ingestion method')
 
         if not os.path.exists(train_dir):
