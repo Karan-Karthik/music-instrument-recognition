@@ -7,7 +7,6 @@ from logger import logging
 from dataclasses import dataclass
 
 
-
 def normalize(tensor):
     mean = tensor.mean()
     std = tensor.std()
