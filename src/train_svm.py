@@ -1,3 +1,5 @@
+import os
+from logger import logging
 import pickle
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -53,3 +55,17 @@ print(f"Recall: {recall * 100:.4f}%")
 print(f"F1-Score: {f1 * 100:.4f}%")
 print("\nDetailed Classification Report:")
 print(classification_report(y_val, y_pred, target_names=label_encoder.classes_))
+
+
+# Save the model
+artifacts_folder = 'artifacts'
+model_filename = 'svm_model.pkl'
+
+model_path = os.path.join(artifacts_folder, model_filename)
+
+try:
+    with open(model_path, 'wb') as file:
+        pickle.dump(svm_model, file)
+    logging.info(f"Model successfully saved to {model_path}")
+except Exception as e:
+    logging.error(f"Error saving model: {e}")
