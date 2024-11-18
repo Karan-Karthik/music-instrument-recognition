@@ -15,8 +15,9 @@ The model achieved high classification performance, demonstrating its effectiven
 **Support Vector Machine (SVM)** is a supervised learning algorithm commonly used for classification tasks. It works by finding a hyperplane in a high-dimensional space that separates the data points of different classes with the maximum margin. The RBF kernel (Radial Basis Function) is a popular kernel used in SVM, which maps the input space into a higher-dimensional space where linear separation is possible. It works well for non-linearly separable data.
 
 
-![SVM Visualization](/Users/karanwork/Desktop/support-vector-machine-svm.jpg.webp)
+![SVM Visualization](images/support-vector-machine-svm.jpg.webp)
 
+/Users/karanwork/Desktop/
 
 ## Model Performance
 
