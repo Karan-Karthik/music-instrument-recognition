@@ -104,14 +104,3 @@ After training, the `train_svm.py` script generates:
 Check the console output for metrics and review the saved heatmap image for visual insights.
 
 ---
-
-### Output Files
-1. **Processed Data**:
-   - `artifacts/processed_train_audio_files.pkl`
-2. **Trained Model**:
-   - `artifacts/svm_model.pkl`
-3. **Performance Metrics**:
-   - Classification heatmap saved as an image.
-
----
-
