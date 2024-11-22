@@ -68,7 +68,7 @@ This will install all necessary libraries, including `librosa`, `torch`, and `sc
 ---
 
 ### Step 2: Load and Transform Data
-The `data_loader.py` script loads raw audio files, preprocesses them into features such as spectrograms and MFCCs, and saves the processed data into a pickle file.
+The `data_loader.py` script loads raw audio files, preprocesses them into MFCCs, and saves the processed data into a pickle file.
 
 Run the following command to execute the data loader and transform the data:
 
