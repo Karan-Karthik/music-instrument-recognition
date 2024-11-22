@@ -100,7 +100,6 @@ After training, the model will be saved as `artifacts/svm_model.pkl`.
 ### Step 4: Evaluate the Model
 After training, the `train_svm.py` script generates:
 - A detailed classification report, including precision, recall, F1-score, and overall accuracy.
-- A heatmap illustrating the classification performance for each class, saved as an image (e.g., `images/classification_report_heatmap.png`).
 
 Check the console output for metrics and review the saved heatmap image for visual insights.
 
