@@ -48,3 +48,71 @@ Below is a heatmap illustrating the classification performance, where a value of
 ![SVM with RBF kernel](images/classification_report_heatmap.png)
 
 This report demonstrates the high performance of the model on the validation set. High accuracy, precision, and recall across different instrument classes reflect the effectiveness of the feature extraction and the SVM classifier.
+
+
+---
+
+## How to Run the Project
+
+Follow these steps to set up and run the project:
+
+### Step 1: Install Dependencies
+Ensure all required dependencies are installed by running the following command in the project directory:
+
+```bash
+pip install -e .
+```
+
+This will install all necessary libraries, including `librosa`, `torch`, and `scikit-learn`.
+
+---
+
+### Step 2: Load and Transform Data
+The `data_loader.py` script loads raw audio files, preprocesses them into features such as spectrograms and MFCCs, and saves the processed data into a pickle file.
+
+Run the following command to execute the data loader and transform the data:
+
+```bash
+python src/data_loader.py
+```
+
+After running this script, the processed data will be saved in the `artifacts` folder as `processed_train_audio_files.pkl`.
+
+---
+
+### Step 3: Train the Model
+The `train_svm.py` script trains the SVM classifier. It:
+1. Loads the processed data from the pickle file.
+2. Splits it into training and validation sets.
+3. Trains the SVM model using an RBF kernel.
+4. Saves the trained model as a pickle file.
+
+Run the training script with the following command:
+
+```bash
+python src/train_svm.py
+```
+
+After training, the model will be saved as `artifacts/svm_model.pkl`.
+
+---
+
+### Step 4: Evaluate the Model
+After training, the `train_svm.py` script generates:
+- A detailed classification report, including precision, recall, F1-score, and overall accuracy.
+- A heatmap illustrating the classification performance for each class, saved as an image (e.g., `images/classification_report_heatmap.png`).
+
+Check the console output for metrics and review the saved heatmap image for visual insights.
+
+---
+
+### Output Files
+1. **Processed Data**:
+   - `artifacts/processed_train_audio_files.pkl`
+2. **Trained Model**:
+   - `artifacts/svm_model.pkl`
+3. **Performance Metrics**:
+   - Classification heatmap saved as an image.
+
+---
+
